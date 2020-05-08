@@ -1,4 +1,5 @@
 const db = require('../../../config/db');
+const Files = require('../models/File');
 
 module.exports = {
 
@@ -34,8 +35,41 @@ module.exports = {
     return db.query(query,values);
 
     },
+    all() {
+        const query = `SELECT * FROM products
+        ORDER BY updated_at DESC`;
+        return db.query(query);
+        
+    },
     find(id) {
-        return db.query(`SELECT *  FROM products WHERE id = $1 `,[id]);
+        return db.query(`SELECT *  FROM products WHERE id = ${id} `);
+    },
+    search(params) {
+        const {filter,category} = params;
+
+        let query = "",
+        filterQuery = `WHERE`
+
+        if (category) {
+            filterQuery = `${filterQuery}
+            products.category_id = ${category}
+            AND`;
+        }
+        filterQuery = `${filterQuery}
+                        products.name ilike '%${filter}%' 
+                        OR products.description ilike '%${filter}%'`;      
+        
+        query = `
+        SELECT products.*,
+            categories.name as category_name
+        FROM products
+        LEFT JOIN categories ON (categories.id = products.category_id)
+        ${filterQuery}
+        GROUP BY  products.id,categories.name`;
+        console.log(`Exibindo o valor da query: ${query}`);
+
+
+        return db.query(query);
     },
     update(data) {
         const query = 
@@ -66,6 +100,7 @@ module.exports = {
         return db.query(query,values);
     },
     delete(id) {
+
         db.query(`DELETE FROM products WHERE id = ${id}`);
     },
 

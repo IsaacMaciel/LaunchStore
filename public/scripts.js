@@ -25,6 +25,9 @@ const PhotosUpload= {
 
     handleFileInput(event){
         const {files: fileList} = event.target;
+        console.log(`Valor do event.target: ${event.target}`);
+        console.log(`Valor do files : ${fileList}`);
+
         PhotosUpload.input = event.target;
 
         if (PhotosUpload.hasLimit(event)) return
@@ -111,6 +114,8 @@ const PhotosUpload= {
         const index = photosArray.indexOf(photoDiv);
 
         PhotosUpload.files.splice(index, 1);
+
+        console.log(index);
         PhotosUpload.input.files= PhotosUpload.getAllFiles();
 
         photoDiv.remove();

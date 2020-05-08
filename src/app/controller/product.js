@@ -13,6 +13,7 @@ module.exports = {
 
         res.render('products/create.njk',{categories});
     },
+    
 
     async  post(req,res){
         const keys = Object.keys(req.body);
@@ -36,6 +37,8 @@ module.exports = {
     async show(req,res) {
         let results = await Product.find(req.params.id);
         const product = results.rows[0];
+
+
 
         if(!product) return res.send('Produtonão encontrado!');
 
@@ -133,7 +136,13 @@ module.exports = {
     },
 
     async delete(req,res) {
-        await Product.delete(req.body.id);
+        const productId = req.body.id;
+        let results = await Product.files(productId);
+
+        const filesDeletePromise = results.rows.map(file => File.delete(file.id));
+        await Promise.all(filesDeletePromise);
+
+        await Product.delete(productId);
 
         return res.redirect('/');
     }
